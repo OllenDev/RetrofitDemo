@@ -25,6 +25,7 @@ import rx.functions.Action1;
 
 public class MainActivity extends Activity implements InstagramServiceListener {
     private static String TAG = MainActivity.class.getSimpleName();
+
     @InjectView(R.id.contentView) TextView contentView;
     @InjectView(R.id.searchEditText) EditText searchEditText;
 
@@ -49,17 +50,20 @@ public class MainActivity extends Activity implements InstagramServiceListener {
 
     @OnClick(R.id.searchButton)
     public void search(View view) {
+        Log.d(TAG, "searching for tag");
         String searchTag = searchEditText.getText().toString();
         InstagramServiceManager.getInstance().searchTags(searchTag);
     }
 
     @Override
     public void onSuccess(TagSearch tagSearch) {
+        Log.d(TAG, "Search for Tag Succeeded");
         contentView.setText("Worked");
     }
 
     @Override
     public void onError(Error error) {
+        Log.d(TAG, "Search for Tag Failed");
         contentView.setText("Error");
     }
 }
