@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Retrofit Demo</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="send_slow_request">Send Slow Request</string>
+</resources>
