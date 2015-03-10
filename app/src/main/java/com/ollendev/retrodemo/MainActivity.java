@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.ollendev.retrodemo.model.TagInfo;
 import com.ollendev.retrodemo.model.TagSearch;
 import com.ollendev.retrodemo.service.InstagramService;
 import com.ollendev.retrodemo.service.InstagramServiceListener;
@@ -25,6 +26,7 @@ import rx.functions.Action1;
 
 public class MainActivity extends Activity implements InstagramServiceListener {
     private static String TAG = MainActivity.class.getSimpleName();
+    private String searchTag = null;
 
     @InjectView(R.id.contentView) TextView contentView;
     @InjectView(R.id.searchEditText) EditText searchEditText;
@@ -51,19 +53,31 @@ public class MainActivity extends Activity implements InstagramServiceListener {
     @OnClick(R.id.searchButton)
     public void search(View view) {
         Log.d(TAG, "searching for tag");
-        String searchTag = searchEditText.getText().toString();
-        InstagramServiceManager.getInstance().searchTags(searchTag);
+        this.searchTag = searchEditText.getText().toString();
+        InstagramServiceManager.getInstance().searchTags(this.searchTag);
     }
 
     @Override
     public void onSuccess(TagSearch tagSearch) {
         Log.d(TAG, "Search for Tag Succeeded");
-        contentView.setText("Worked");
+        tellHowManyTags(tagSearch);
     }
 
     @Override
     public void onError(Error error) {
         Log.d(TAG, "Search for Tag Failed");
         contentView.setText("Error");
+    }
+
+    private void tellHowManyTags(TagSearch tagSearch) {
+        String updateText = "Couldn't find any tag named " + tagSearch + ".";
+        if (tagSearch != null) {
+            for (TagInfo tagInfo : tagSearch.tagList) {
+                if (tagInfo.name.equals(searchTag)) {
+                    updateText = searchTag + " has " + tagInfo.count.toString() + " pics.";
+                }
+            }
+        }
+        contentView.setText(updateText);
     }
 }
