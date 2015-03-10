@@ -14,8 +14,8 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 
 
-public class BlankActivity extends Activity {
-    private static final String TAG = BlankActivity.class.getSimpleName();
+public class SecondActivity extends Activity {
+    private static final String TAG = SecondActivity.class.getSimpleName();
     String endPoint = "https://peaceful-brook-1682.herokuapp.com";
 
     @InjectView(R.id.response) TextView responseTextView;
@@ -34,11 +34,11 @@ public class BlankActivity extends Activity {
                 .setEndpoint(endPoint)
                 .build();
         DemoService service = restAdapter.create(DemoService.class);
-        service.getSlowMessage(new Callback<Response>() {
+        service.getSlowMessage(new Callback<DemoModel>() {
             @Override
-            public void success(Response response, retrofit.client.Response response2) {
+            public void success(DemoModel demoModel, retrofit.client.Response response2) {
                 Log.d(TAG, "Got slow response");
-                responseTextView.setText(response.message);
+                responseTextView.setText(demoModel.message);
             }
 
             @Override

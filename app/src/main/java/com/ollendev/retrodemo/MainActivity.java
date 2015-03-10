@@ -20,9 +20,8 @@ import rx.functions.Action1;
 public class MainActivity extends Activity {
     private static String TAG = MainActivity.class.getSimpleName();
     DemoService service;
-    Observable<Response> observableResponse;
+    Observable<DemoModel> observableResponse;
     String apiId = "54fd0212a5dc31380837da57";
-//    String endPoint = "http://www.mocky.io";
     String endPoint = "https://peaceful-brook-1682.herokuapp.com";
 
     @InjectView(R.id.contentView) TextView contentView;
@@ -35,6 +34,7 @@ public class MainActivity extends Activity {
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(endPoint)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
         service = restAdapter.create(DemoService.class);
 
@@ -47,24 +47,24 @@ public class MainActivity extends Activity {
 
     @OnClick(R.id.openActivityButton)
     public void openActivity(View view) {
-        Intent intent = new Intent(this, BlankActivity.class);
+        Intent intent = new Intent(this, SecondActivity.class);
         this.startActivity(intent);
     }
 
     @OnClick(R.id.sendSyncButton)
     public void sendSync(View view) {
         Log.d(TAG, "send");
-        Response rep = service.getMessage(apiId);
+        DemoModel rep = service.getMessage(apiId);
         Log.d(TAG, "response received");
         contentView.setText(rep.message);
     }
 
     @OnClick(R.id.sendAsyncButton)
     public void sendAsyncButton(View view) {
-        service.getMessage(apiId, new Callback<Response>() {
+        service.getMessage(apiId, new Callback<DemoModel>() {
             @Override
-            public void success(Response response, retrofit.client.Response response2) {
-                MainActivity.this.contentView.setText(response.message);
+            public void success(DemoModel demoModel, retrofit.client.Response response2) {
+                MainActivity.this.contentView.setText(demoModel.message);
             }
 
             @Override
@@ -78,10 +78,10 @@ public class MainActivity extends Activity {
     @OnClick(R.id.sendRxButton)
     public void sendRx(View view) {
         observableResponse = service.getMessageRx(apiId);
-        observableResponse.subscribe(new Action1<Response>() {
+        observableResponse.subscribe(new Action1<DemoModel>() {
                     @Override
-                    public void call(Response response) {
-                        MainActivity.this.contentView.setText(response.message);
+                    public void call(DemoModel demoModel) {
+                        MainActivity.this.contentView.setText(demoModel.message);
                     }
                 });
     }

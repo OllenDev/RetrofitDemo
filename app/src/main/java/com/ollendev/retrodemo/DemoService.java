@@ -1,9 +1,12 @@
 package com.ollendev.retrodemo;
 
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Headers;
+import retrofit.http.POST;
 import retrofit.http.Path;
+import retrofit.http.Query;
 import rx.Observable;
 
 /**
@@ -13,23 +16,29 @@ import rx.Observable;
  */
 public interface DemoService {
 
-    //Synchronous
+    //Synchronous - Path Parameter
     @Headers({"Accept: application/json"})
-    @GET("/v2/{id}")
-    Response getMessage(@Path("id") String id);
+    @GET("/echo/{id}")
+    DemoModel getMessage(@Path("id") String id);
 
-    //Asynchronous
+    //Asynchronous - Query Parameter
     @Headers({"Accept: application/json"})
-    @GET("/v2/{id}")
-    void getMessage(@Path("id") String id, Callback<Response> response);
+    @GET("/saymyname")
+    void getMessage(@Query("myname") String name, Callback<DemoModel> response);
 
-    //Observable
+    //Observable - Path Parameter
     @Headers({"Accept: application/json"})
-    @GET("/v2/{id}")
-    Observable<Response> getMessageRx(@Path("id") String id);
+    @GET("/test/{id}")
+    Observable<DemoModel> getMessageRx(@Path("id") String id);
 
     //Asynchronous
     @Headers({"Accept: application/json"})
     @GET("/delay")
-    void getSlowMessage(Callback<Response> response);
+    void getSlowMessage(Callback<DemoModel> response);
+
+    //Asynchronous Post - Body
+    @Headers({"Content: application/json"})
+    @POST("/echo")
+    void echo(@Body String json, Callback<DemoModel> response);
+
 }

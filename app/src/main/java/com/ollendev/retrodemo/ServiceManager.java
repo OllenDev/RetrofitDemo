@@ -29,4 +29,8 @@ public class ServiceManager {
     public void removeListener(ResponseListener listener) {
         listeners.remove(listener);
     }
+
+    public void getMessage(DemoModel demoModel) {
+
+    }
 }
