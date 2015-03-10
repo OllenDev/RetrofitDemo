@@ -5,7 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import com.ollendev.retrodemo.model.TagSearch;
+import com.ollendev.retrodemo.service.InstagramService;
+import com.ollendev.retrodemo.service.InstagramServiceListener;
+import com.ollendev.retrodemo.service.InstagramServiceManager;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -17,72 +23,43 @@ import rx.Observable;
 import rx.functions.Action1;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements InstagramServiceListener {
     private static String TAG = MainActivity.class.getSimpleName();
-    DemoService service;
-    Observable<DemoModel> observableResponse;
-    String apiId = "54fd0212a5dc31380837da57";
-    String endPoint = "https://peaceful-brook-1682.herokuapp.com";
-
     @InjectView(R.id.contentView) TextView contentView;
+    @InjectView(R.id.searchEditText) EditText searchEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+    }
 
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(endPoint)
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .build();
-        service = restAdapter.create(DemoService.class);
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        InstagramServiceManager.getInstance().addListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        InstagramServiceManager.getInstance().removeListener(this);
     }
 
-    @OnClick(R.id.openActivityButton)
-    public void openActivity(View view) {
-        Intent intent = new Intent(this, SecondActivity.class);
-        this.startActivity(intent);
+    @OnClick(R.id.searchButton)
+    public void search(View view) {
+        String searchTag = searchEditText.getText().toString();
+        InstagramServiceManager.getInstance().searchTags(searchTag);
     }
 
-    @OnClick(R.id.sendSyncButton)
-    public void sendSync(View view) {
-        Log.d(TAG, "send");
-        DemoModel rep = service.getMessage(apiId);
-        Log.d(TAG, "response received");
-        contentView.setText(rep.message);
+    @Override
+    public void onSuccess(TagSearch tagSearch) {
+        contentView.setText("Worked");
     }
 
-    @OnClick(R.id.sendAsyncButton)
-    public void sendAsyncButton(View view) {
-        service.getMessage(apiId, new Callback<DemoModel>() {
-            @Override
-            public void success(DemoModel demoModel, retrofit.client.Response response2) {
-                MainActivity.this.contentView.setText(demoModel.message);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e(TAG, error.getMessage());
-                MainActivity.this.contentView.setText(error.getMessage());
-            }
-        });
-    }
-
-    @OnClick(R.id.sendRxButton)
-    public void sendRx(View view) {
-        observableResponse = service.getMessageRx(apiId);
-        observableResponse.subscribe(new Action1<DemoModel>() {
-                    @Override
-                    public void call(DemoModel demoModel) {
-                        MainActivity.this.contentView.setText(demoModel.message);
-                    }
-                });
+    @Override
+    public void onError(Error error) {
+        contentView.setText("Error");
     }
 }
